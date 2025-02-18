@@ -30,14 +30,53 @@
 #   - it's fine to reuse parts of your unigram implementation from HW3.
 
 # You will need to use log and -inf here. 
+import os
+import csv
 # You can add any additional import statements you need here.
 from math import log, inf
-
+from collections import Counter
 
 #######################
 # YOUR CODE GOES HERE #
 #######################
 
+def train_unigram_model(training_data):
+    word_counts = Counter()
+    total_words = 0
+    
+    for filename in os.listdir(training_data):
+        if filename.endswith(".txt"):
+            with open(os.path.join(training_data, filename), "r", encoding="utf-8") as file:
+                for line in file:
+                    tokens = line.strip().lower().split()
+                    word_counts.update(tokens)
+                    total_words += len(tokens)
+    
+    unigram_probs = {word: count / total_words for word, count in word_counts.items()}
+    return unigram_probs, total_words
+
+def calculate_log_probability(sentence, unigram_probs):
+    tokens = sentence.strip().lower().split()
+    log_prob = 0
+    
+    for token in tokens:
+        if token in unigram_probs:
+            log_prob += log(unigram_probs[token])
+        else:
+            return -inf
+    
+    return log_prob
+
+def score_unigrams(training_data, test_data, output_csv):
+    unigram_probs, _ = train_unigram_model(training_data)
+    
+    with open(test_data, "r", encoding="utf-8") as test, open(output_csv, "w", newline="", encoding="utf-8") as output:
+        writer = csv.writer(output)
+        writer.writerow(["sentence", "unigram_prob"])
+        
+        for line in test:
+            log_prob = calculate_log_probability(line, unigram_probs)
+            writer.writerow([line.strip(), log_prob])
 
 
 # Do not modify the following line
