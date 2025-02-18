@@ -33,12 +33,54 @@
 # You can add any additional import statements you need here.
 from math import log, inf
 
-
 #######################
 # YOUR CODE GOES HERE #
 #######################
+import os
+import csv
+import math
+from pathlib import Path
+from collections import Counter
 
+def train_unigram_model(training_path):
+    training_path = Path(training_path)
+    word_counts = Counter()
+    total_words = 0
+    
+    for file in training_path.glob("*.txt"):
+        with file.open("r") as f:
+            for line in f:
+                words = line.strip().lower().split()
+                word_counts.update(words)
+                total_words += len(words)
+    
+    unigram_probs = {word: count / total_words for word, count in word_counts.items()}
+    return unigram_probs, total_words
 
+def calculate_log_probability(sentence, unigram_probs, total_words):
+    words = sentence.strip().lower().split()
+    log_prob = 0
+    
+    for word in words:
+        if word in unigram_probs:
+            log_prob += math.log(unigram_probs[word])
+        else:
+            return float('-inf')
+    
+    return log_prob
+
+def score_unigrams(training_data_path, test_file_path, output_csv_path):
+    unigram_probs, total_words = train_unigram_model(training_data_path)
+    test_file_path = Path(test_file_path)
+    output_csv_path = Path(output_csv_path)
+    
+    with test_file_path.open("r") as test_file, output_csv_path.open("w", newline="") as csv_file:
+        writer = csv.writer(csv_file)
+        writer.writerow(["sentence", "unigram_prob"])
+        
+        for line in test_file:
+            log_prob = calculate_log_probability(line, unigram_probs, total_words)
+            writer.writerow([line.strip(), log_prob])
 
 # Do not modify the following line
 if __name__ == "__main__":

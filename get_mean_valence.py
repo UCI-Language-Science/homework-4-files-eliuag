@@ -23,6 +23,25 @@
 #######################
 # YOUR CODE GOES HERE #
 #######################
+import csv
+from collections import defaultdict
+
+def get_mean_valence(file_path):
+    valence_sums = defaultdict(float)
+    valence_counts = defaultdict(int)
+    
+    with open(file_path, newline='', encoding='utf-8') as csvfile:
+        reader = csv.reader(csvfile)
+        next(reader)
+        
+        for row in reader:
+            modality, valence = row[1], float(row[2])
+            valence_sums[modality] += valence
+            valence_counts[modality] += 1
+    
+    mean_valences = {modality: valence_sums[modality] / valence_counts[modality] for modality in valence_sums}
+    
+    return mean_valences
 
 # Do not modify the following line
 if __name__ == "__main__":
