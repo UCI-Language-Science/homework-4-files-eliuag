@@ -32,7 +32,7 @@ def get_mean_valence(file_path):
     
     with open(file_path, newline='', encoding='utf-8') as csvfile:
         reader = csv.reader(csvfile)
-        next(reader)  # Skip header row
+        next(reader)
         
         for row in reader:
             modality, valence = row[1], float(row[2])
@@ -42,11 +42,6 @@ def get_mean_valence(file_path):
     mean_valences = {modality: valence_sums[modality] / valence_counts[modality] for modality in valence_sums}
     
     return mean_valences
-
-# Example usage:
-# mean_valences = get_mean_valence("valence_data/winter_2016_senses_valence.csv")
-# print(mean_valences)
-
 
 # Do not modify the following line
 if __name__ == "__main__":
